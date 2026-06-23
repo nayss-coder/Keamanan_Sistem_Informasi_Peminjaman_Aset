@@ -1,0 +1,110 @@
+version: '3.8'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SI-ALAT — Docker Compose
+# Jalankan: docker compose up -d
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Database ──────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: si-alat-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: si_alat
+      MYSQL_USER: sialat
+      MYSQL_PASSWORD: sialat123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - si-alat-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Next.js App ───────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: si-alat-app
+    restart: unless-stopped
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: sialat
+      DB_PASSWORD: sialat123
+      DB_NAME: si_alat
+      JWT_SECRET: si-alat-super-secret-key-2024
+      JWT_EXPIRES_IN: 15m
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - si-alat-network
+
+  # ── Apache APISIX (konfigurasi oleh Kila) ─────────────────────────────────
+  # Uncomment setelah folder docker/apisix diisi
+  # apisix:
+  #   image: apache/apisix:3.9.0-debian
+  #   container_name: si-alat-apisix
+  #   volumes:
+  #     - ./docker/apisix/config.yaml:/usr/local/apisix/conf/config.yaml
+  #   ports:
+  #     - "9080:9080"
+  #     - "9443:9443"
+  #   depends_on:
+  #     - etcd
+  #     - app
+  #   networks:
+  #     - si-alat-network
+
+  # ── etcd (config store APISIX) ────────────────────────────────────────────
+  # etcd:
+  #   image: bitnami/etcd:3.5
+  #   container_name: si-alat-etcd
+  #   environment:
+  #     ALLOW_NONE_AUTHENTICATION: "yes"
+  #   ports:
+  #     - "2379:2379"
+  #   networks:
+  #     - si-alat-network
+
+  # ── Apache SkyWalking OAP (konfigurasi oleh Agidia) ───────────────────────
+  # skywalking-oap:
+  #   image: apache/skywalking-oap-server:9.7.0
+  #   container_name: si-alat-skywalking-oap
+  #   ports:
+  #     - "11800:11800"
+  #     - "12800:12800"
+  #   networks:
+  #     - si-alat-network
+
+  # skywalking-ui:
+  #   image: apache/skywalking-ui:9.7.0
+  #   container_name: si-alat-skywalking-ui
+  #   environment:
+  #     SW_OAP_ADDRESS: http://skywalking-oap:12800
+  #   ports:
+  #     - "8088:8080"
+  #   depends_on:
+  #     - skywalking-oap
+  #   networks:
+  #     - si-alat-network
+
+networks:
+  si-alat-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
