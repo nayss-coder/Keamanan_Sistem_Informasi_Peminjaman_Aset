@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SI-ALAT — Docker Compose
@@ -6,7 +6,6 @@ version: '3.8'
 # ─────────────────────────────────────────────────────────────────────────────
 
 services:
-
   # ── Database ──────────────────────────────────────────────────────────────
   mysql:
     image: mysql:8.0
@@ -53,7 +52,7 @@ services:
     networks:
       - si-alat-network
 
-  # ── Apache APISIX (konfigurasi oleh Kila) ─────────────────────────────────
+  # ── Apache APISIX (konfigurasi oleh Nayla) ─────────────────────────────────
   # Uncomment setelah folder docker/apisix diisi
   # apisix:
   #   image: apache/apisix:3.9.0-debian

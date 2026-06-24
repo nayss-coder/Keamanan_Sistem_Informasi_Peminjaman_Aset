@@ -46,13 +46,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="px-5 py-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-xs">SA</span>
-          </div>
-          <div>
-            <p className="text-white font-semibold text-sm leading-none">SI-ALAT</p>
-            <p className="text-gray-500 text-xs mt-0.5">Lab Equipment System</p>
-          </div>
+          <img src="/images/logo.png" alt="SIALAT Logo" className="h-20 w-auto object-contain" />
         </div>
       </div>
 

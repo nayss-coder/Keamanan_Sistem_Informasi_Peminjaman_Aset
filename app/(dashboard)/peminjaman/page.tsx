@@ -2,7 +2,15 @@
 import { useEffect, useState } from 'react'
 import { Plus, X, Check, RotateCcw, ClipboardList } from 'lucide-react'
 import { Peminjaman, Peralatan } from '@/types'
-import { STATUS_PEMINJAMAN_COLOR, STATUS_PEMINJAMAN_LABEL, formatDate } from '@/lib/utils'
+import { STATUS_PEMINJAMAN_LABEL, formatDate } from '@/lib/utils'
+
+const STATUS_COLORS: Record<string, string> = {
+  menunggu:     'bg-amber-100 text-amber-800',
+  disetujui:    'bg-blue-100 text-blue-800',
+  ditolak:      'bg-red-100 text-red-800',
+  dipinjam:     'bg-orange-100 text-orange-800',
+  dikembalikan: 'bg-green-100 text-green-800',
+}
 
 export default function PeminjamanPage() {
   const [data, setData]       = useState<Peminjaman[]>([])
@@ -140,7 +148,7 @@ export default function PeminjamanPage() {
                   <td className="text-gray-500 whitespace-nowrap">{formatDate(p.tanggal_pinjam)}</td>
                   <td className="text-gray-500 whitespace-nowrap">{formatDate(p.tanggal_kembali)}</td>
                   <td className="max-w-xs truncate text-gray-500" title={p.keperluan}>{p.keperluan}</td>
-                  <td><span className={`badge ${STATUS_PEMINJAMAN_COLOR[p.status]}`}>{STATUS_PEMINJAMAN_LABEL[p.status]}</span></td>
+                  <td><span className={`badge ${STATUS_COLORS[p.status] || 'bg-gray-100 text-gray-800'}`}>{STATUS_PEMINJAMAN_LABEL[p.status]}</span></td>
                   {canApprove && (
                     <td>
                       <div className="flex gap-1">

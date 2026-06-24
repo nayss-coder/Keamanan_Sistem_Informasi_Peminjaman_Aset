@@ -48,12 +48,11 @@ export default function LoginPage() {
         }}
       >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-orange-500 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">SA</span>
-          </div>
-          <span className="text-white font-semibold text-lg tracking-tight">
-            SI-ALAT
-          </span>
+          <img
+            src="/images/logo.png"
+            alt="SIALAT Logo"
+            className="h-28 w-auto object-contain"
+          />
         </div>
 
         <div>
@@ -103,10 +102,11 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-2 mb-8">
-            <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
-              <span className="text-white font-bold text-xs">SA</span>
-            </div>
-            <span className="font-semibold text-gray-900">SI-ALAT</span>
+            <img
+              src="/images/logo.png"
+              alt="SIALAT Logo"
+              className="h-20 w-auto object-contain bg-[#0D1425] p-3.5 rounded-2xl"
+            />
           </div>
 
           <div className="mb-8">
@@ -174,58 +174,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo accounts */}
-          <div className="mt-8 p-4 rounded-lg bg-white border border-gray-200">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-              Akun Demo
-            </p>
-            <div className="space-y-1.5">
-              {[
-                {
-                  email: "admin@sialat.ac.id",
-                  pass: "admin123",
-                  role: "Admin",
-                },
-                {
-                  email: "budi@sialat.ac.id",
-                  pass: "dosen123",
-                  role: "Dosen PJ",
-                },
-                {
-                  email: "rini@sialat.ac.id",
-                  pass: "laboran123",
-                  role: "Laboran",
-                },
-                {
-                  email: "andi@student.ac.id",
-                  pass: "mhs123",
-                  role: "Mahasiswa",
-                },
-              ].map((a) => (
-                <button
-                  key={a.email}
-                  type="button"
-                  onClick={() => {
-                    setEmail(a.email);
-                    setPassword(a.pass);
-                  }}
-                  className="w-full text-left px-3 py-2 rounded hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                >
-                  <div>
-                    <span className="text-xs font-medium text-gray-700">
-                      {a.role}
-                    </span>
-                    <span className="text-xs text-gray-400 ml-2">
-                      {a.email}
-                    </span>
-                  </div>
-                  <span className="text-xs text-orange-500 opacity-0 group-hover:opacity-100">
-                    Pakai →
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

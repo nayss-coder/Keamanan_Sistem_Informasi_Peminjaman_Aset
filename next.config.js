@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   env: {
     JWT_SECRET: process.env.JWT_SECRET || 'si-alat-secret-key-dev',
     DB_HOST: process.env.DB_HOST || 'localhost',
