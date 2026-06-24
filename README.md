@@ -7,6 +7,7 @@
 ## 🚀 Cara Menjalankan (Lokal — Tanpa Docker)
 
 ### Prasyarat
+
 - Node.js 18+
 - MySQL 8.0 (bisa pakai XAMPP atau install manual)
 
@@ -54,13 +55,13 @@ docker exec si-alat-app node lib/db-migrate.js
 
 ## 👤 Akun Demo
 
-| Role        | Email                    | Password     |
-|-------------|--------------------------|--------------|
-| Admin       | admin@sialat.ac.id       | admin123     |
-| Dosen PJ    | budi@sialat.ac.id        | dosen123     |
-| Laboran     | rini@sialat.ac.id        | laboran123   |
-| Asisten Lab | dian@sialat.ac.id        | asisten123   |
-| Mahasiswa   | andi@student.ac.id       | mhs123       |
+| Role        | Email              | Password   |
+| ----------- | ------------------ | ---------- |
+| Admin       | admin@sialat.ac.id | admin123   |
+| Dosen PJ    | budi@sialat.ac.id  | dosen123   |
+| Laboran     | rini@sialat.ac.id  | laboran123 |
+| Asisten Lab | dian@sialat.ac.id  | asisten123 |
+| Mahasiswa   | andi@student.ac.id | mhs123     |
 
 ---
 
@@ -89,9 +90,9 @@ si-alat/
 │   └── db-migrate.js           Migration + seeding
 ├── types/index.ts              TypeScript types
 ├── docker/                     ← Diisi oleh tim security
-│   ├── apisix/                 Apache APISIX config (Kila)
-│   ├── fortress/               Apache Fortress config (Nahda)
-│   ├── skywalking/             Apache SkyWalking config (Agidia)
+│   ├── apisix/                 Apache APISIX config
+│   ├── fortress/               Apache Fortress config
+│   ├── skywalking/             Apache SkyWalking config
 │   └── mysql/
 ├── docker-compose.yml
 └── .env.local
@@ -101,30 +102,30 @@ si-alat/
 
 ## 🔐 Endpoint API
 
-| Method | Endpoint                   | Role             | Keterangan                     |
-|--------|----------------------------|------------------|--------------------------------|
-| POST   | /api/auth/login             | Public           | Login, return JWT              |
-| POST   | /api/auth/logout            | Authenticated    | Hapus cookie token             |
-| GET    | /api/auth/me                | Authenticated    | Data user saat ini             |
-| GET    | /api/peralatan              | Authenticated    | List peralatan                 |
-| POST   | /api/peralatan              | laboran, admin   | Tambah peralatan               |
-| PUT    | /api/peralatan/[id]         | laboran, admin   | Update peralatan               |
-| DELETE | /api/peralatan/[id]         | admin            | Hapus peralatan                |
-| GET    | /api/peminjaman             | Authenticated    | List peminjaman (filtered)     |
-| POST   | /api/peminjaman             | Authenticated    | Ajukan peminjaman              |
-| PATCH  | /api/peminjaman/[id]        | dosen_pj, admin  | approve / reject / return      |
-| GET    | /api/admin/users            | admin            | List semua user                |
-| GET    | /api/admin/stats            | Authenticated    | Statistik dashboard            |
+| Method | Endpoint             | Role            | Keterangan                 |
+| ------ | -------------------- | --------------- | -------------------------- |
+| POST   | /api/auth/login      | Public          | Login, return JWT          |
+| POST   | /api/auth/logout     | Authenticated   | Hapus cookie token         |
+| GET    | /api/auth/me         | Authenticated   | Data user saat ini         |
+| GET    | /api/peralatan       | Authenticated   | List peralatan             |
+| POST   | /api/peralatan       | laboran, admin  | Tambah peralatan           |
+| PUT    | /api/peralatan/[id]  | laboran, admin  | Update peralatan           |
+| DELETE | /api/peralatan/[id]  | admin           | Hapus peralatan            |
+| GET    | /api/peminjaman      | Authenticated   | List peminjaman (filtered) |
+| POST   | /api/peminjaman      | Authenticated   | Ajukan peminjaman          |
+| PATCH  | /api/peminjaman/[id] | dosen_pj, admin | approve / reject / return  |
+| GET    | /api/admin/users     | admin           | List semua user            |
+| GET    | /api/admin/stats     | Authenticated   | Statistik dashboard        |
 
 ---
 
 ## 🧪 Skenario Pengujian Keamanan (BEFORE vs AFTER)
 
-| # | Pengujian | BEFORE | AFTER (dengan Apache) |
-|---|-----------|--------|----------------------|
-| 1 | Akses API tanpa token | 200 OK | 401 (APISIX) |
-| 2 | Mahasiswa akses /api/admin/users | 403 (app) | 403 (Fortress) |
-| 3 | Login salah 10x berturut | Tidak dibatasi | 429 (APISIX rate limit) |
-| 4 | Akses via HTTP | Plain text | Redirect HTTPS |
-| 5 | Token expired | Masih jalan | 401 Token Expired |
-| 6 | Trace aktivitas | Tidak ada | Terlihat di SkyWalking |
+| #   | Pengujian                        | BEFORE         | AFTER (dengan Apache)   |
+| --- | -------------------------------- | -------------- | ----------------------- |
+| 1   | Akses API tanpa token            | 200 OK         | 401 (APISIX)            |
+| 2   | Mahasiswa akses /api/admin/users | 403 (app)      | 403 (Fortress)          |
+| 3   | Login salah 10x berturut         | Tidak dibatasi | 429 (APISIX rate limit) |
+| 4   | Akses via HTTP                   | Plain text     | Redirect HTTPS          |
+| 5   | Token expired                    | Masih jalan    | 401 Token Expired       |
+| 6   | Trace aktivitas                  | Tidak ada      | Terlihat di SkyWalking  |
