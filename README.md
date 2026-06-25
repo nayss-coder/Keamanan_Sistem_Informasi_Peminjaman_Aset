@@ -127,5 +127,4 @@ si-alat/
 | 2   | Mahasiswa akses /api/admin/users | 403 (app)      | 403 (Fortress)          |
 | 3   | Login salah 10x berturut         | Tidak dibatasi | 429 (APISIX rate limit) |
 | 4   | Akses via HTTP                   | Plain text     | Redirect HTTPS          |
-| 5   | Token expired                    | Masih jalan    | 401 Token Expired       |
-| 6   | Trace aktivitas                  | Tidak ada      | Terlihat di SkyWalking  |
+| 5   | Trace aktivitas                  | Tidak ada      | Terlihat di SkyWalking  |
