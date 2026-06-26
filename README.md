@@ -126,5 +126,4 @@ si-alat/
 | 1   | Akses API tanpa token            | 200 OK         | 401 (APISIX)            |
 | 2   | Mahasiswa akses /api/admin/users | 403 (app)      | 403 (Fortress)          |
 | 3   | Login salah 10x berturut         | Tidak dibatasi | 429 (APISIX rate limit) |
-| 4   | Akses via HTTP                   | Plain text     | Redirect HTTPS          |
-| 5   | Trace aktivitas                  | Tidak ada      | Terlihat di SkyWalking  |
+| 4   | Trace aktivitas                  | Tidak ada      | Terlihat di SkyWalking  |
