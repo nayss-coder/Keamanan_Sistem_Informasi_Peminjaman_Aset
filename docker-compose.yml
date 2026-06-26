@@ -1,12 +1,89 @@
-version: "3.8"
-
-# ─────────────────────────────────────────────────────────────────────────────
-# SI-ALAT — Docker Compose
-# Jalankan: docker compose up -d
-# ─────────────────────────────────────────────────────────────────────────────
+networks:
+  apisix-net:
+    driver: bridge
 
 services:
-  # ── Database ──────────────────────────────────────────────────────────────
+  etcd:
+    image: gcr.io/etcd-development/etcd:v3.5.0
+    container_name: proyek-apisix-etcd
+    command:
+      - /usr/local/bin/etcd
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://0.0.0.0:2379
+    networks:
+      - apisix-net
+    ports:
+      - "2379:2379"
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  apisix:
+    image: apache/apisix:latest
+    container_name: proyek-apisix-apisix
+    volumes:
+      - ./apisix_config/config.yaml:/usr/local/apisix/conf/config.yaml
+    ports:
+      - "9080:9080"
+      - "9180:9180"
+    networks:
+      - apisix-net
+    depends_on:
+      etcd:
+        condition: service_healthy
+    restart: unless-stopped
+
+  skywalking-oap:
+    image: apache/skywalking-oap-server:9.7.0
+    container_name: proyek-apisix-skywalking-oap
+    ports:
+      - "11800:11800"
+      - "12800:12800"
+    networks:
+      - apisix-net
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "sh",
+          "-c",
+          "curl -sf http://localhost:12800/internal/l7check || exit 1",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    restart: unless-stopped
+
+  skywalking-ui:
+    image: apache/skywalking-ui:9.7.0
+    container_name: proyek-apisix-skywalking-ui
+    ports:
+      - "8080:8080"
+    environment:
+      - SW_OAP_ADDRESS=http://skywalking-oap:12800
+    networks:
+      - apisix-net
+    depends_on:
+      skywalking-oap:
+        condition: service_healthy
+    restart: unless-stopped
+
+  fortress-ldap:
+    image: osixia/openldap:1.5.0
+    container_name: proyek-apisix-fortress-ldap
+    ports:
+      - "389:389"
+    environment:
+      - LDAP_ORGANISATION=Apache Fortress
+      - LDAP_DOMAIN=example.com
+      - LDAP_ADMIN_PASSWORD=secret
+    networks:
+      - apisix-net
+    restart: unless-stopped
+
   mysql:
     image: mysql:8.0
     container_name: si-alat-mysql
@@ -21,14 +98,13 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - si-alat-network
+      - apisix-net
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # ── Next.js App ───────────────────────────────────────────────────────────
   app:
     build:
       context: .
@@ -44,66 +120,18 @@ services:
       JWT_SECRET: si-alat-super-secret-key-2024
       JWT_EXPIRES_IN: 15m
       NODE_ENV: production
+      SW_AGENT_NAME: "si-alat-backend"
+      SW_AGENT_COLLECTOR_BACKEND_SERVICES: "proyek-apisix-skywalking-oap:11800"
     ports:
       - "3000:3000"
     depends_on:
       mysql:
         condition: service_healthy
+      skywalking-oap:
+        condition: service_healthy
     networks:
-      - si-alat-network
-
-  # ── Apache APISIX (konfigurasi oleh Nayla) ─────────────────────────────────
-  # Uncomment setelah folder docker/apisix diisi
-  # apisix:
-  #   image: apache/apisix:3.9.0-debian
-  #   container_name: si-alat-apisix
-  #   volumes:
-  #     - ./docker/apisix/config.yaml:/usr/local/apisix/conf/config.yaml
-  #   ports:
-  #     - "9080:9080"
-  #     - "9443:9443"
-  #   depends_on:
-  #     - etcd
-  #     - app
-  #   networks:
-  #     - si-alat-network
-
-  # ── etcd (config store APISIX) ────────────────────────────────────────────
-  # etcd:
-  #   image: bitnami/etcd:3.5
-  #   container_name: si-alat-etcd
-  #   environment:
-  #     ALLOW_NONE_AUTHENTICATION: "yes"
-  #   ports:
-  #     - "2379:2379"
-  #   networks:
-  #     - si-alat-network
-
-  # ── Apache SkyWalking OAP (konfigurasi oleh Agidia) ───────────────────────
-  # skywalking-oap:
-  #   image: apache/skywalking-oap-server:9.7.0
-  #   container_name: si-alat-skywalking-oap
-  #   ports:
-  #     - "11800:11800"
-  #     - "12800:12800"
-  #   networks:
-  #     - si-alat-network
-
-  # skywalking-ui:
-  #   image: apache/skywalking-ui:9.7.0
-  #   container_name: si-alat-skywalking-ui
-  #   environment:
-  #     SW_OAP_ADDRESS: http://skywalking-oap:12800
-  #   ports:
-  #     - "8088:8080"
-  #   depends_on:
-  #     - skywalking-oap
-  #   networks:
-  #     - si-alat-network
-
-networks:
-  si-alat-network:
-    driver: bridge
+      - apisix-net
 
 volumes:
   mysql_data:
+

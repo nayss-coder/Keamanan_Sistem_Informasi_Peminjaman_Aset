@@ -1,0 +1,32 @@
+deployment:
+  role: traditional
+  role_traditional:
+    config_provider: etcd
+  etcd:
+    host:
+      - http://etcd:2379
+    prefix: /apisix
+  admin:
+    admin_key:
+      - name: admin
+        key: edd1c9f034335f136f87ad84b625c8f1
+        role: admin
+    allow_admin:
+      - 0.0.0.0/0
+
+apisix:
+  node_listen: 9080
+  enable_admin: true
+
+plugin_attr:
+  skywalking:
+    service_name: SIAlat
+    service_instance_name: SIAlat-Instance
+    endpoint_addr: http://skywalking-oap:12800
+
+plugins:
+  - skywalking
+  - limit-req
+  - jwt-auth
+  - ip-restriction
+  - cors
