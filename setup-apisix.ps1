@@ -3,7 +3,7 @@
 
 $AdminUrl = "http://localhost:9180"
 $AdminKey = "edd1c9f034335f136f87ad84b625c8f1"
-$NextJsPort = 3001 # Port aplikasi Next.js Anda (bisa 3000 atau 3001)
+$NextJsPort = 3001
 
 Write-Host "=============================================" -ForegroundColor Cyan
 Write-Host "⚙️ SETUP APISIX ROUTES & PLUGINS FOR SI-ALAT" -ForegroundColor Cyan
@@ -43,7 +43,7 @@ $consumerBody = @{
     plugins = @{
         "jwt-auth" = @{
             key = "si-alat-key"
-            secret = "si-alat-super-secret-key-2024" # Harus sama dengan JWT_SECRET di backend
+            secret = "si-alat-super-secret-key-2024"
         }
     }
 } | ConvertTo-Json -Depth 5
@@ -60,7 +60,7 @@ Write-Host "[2/4] Mendaftarkan Route: /api/auth/login (Rate Limited & Traced)...
 $loginRouteBody = @{
     uri = "/api/auth/login"
     methods = @("POST")
-    priority = 10 # Prioritas tinggi agar dievaluasi duluan
+    priority = 10
     upstream = @{
         type = "roundrobin"
         nodes = @{
@@ -75,9 +75,9 @@ $loginRouteBody = @{
             key_type = "var"
             key = "remote_addr"
         }
-        "skywalking" = @{} # Aktifkan tracing SkyWalking
+        "skywalking" = @{}
         "redirect" = @{
-            http_to_https = $true # Redirect otomatis HTTP -> HTTPS
+            http_to_https = $true
         }
     }
 } | ConvertTo-Json -Depth 5
@@ -93,7 +93,7 @@ try {
 Write-Host "[3/4] Mendaftarkan Route: /api/* (Terproteksi JWT & Traced)..." -ForegroundColor Yellow
 $protectedRouteBody = @{
     uri = "/api/*"
-    priority = 5 # Prioritas sedang
+    priority = 5
     upstream = @{
         type = "roundrobin"
         nodes = @{
@@ -102,9 +102,9 @@ $protectedRouteBody = @{
     }
     plugins = @{
         "jwt-auth" = @{}
-        "skywalking" = @{} # Aktifkan tracing SkyWalking
+        "skywalking" = @{}
         "redirect" = @{
-            http_to_https = $true # Redirect otomatis HTTP -> HTTPS
+            http_to_https = $true
         }
     }
 } | ConvertTo-Json -Depth 5
@@ -120,7 +120,7 @@ try {
 Write-Host "[4/4] Mendaftarkan Route: /* (Frontend Web UI & Traced)..." -ForegroundColor Yellow
 $frontendRouteBody = @{
     uri = "/*"
-    priority = 1 # Prioritas terendah, mencocokkan jika bukan /api/
+    priority = 1
     upstream = @{
         type = "roundrobin"
         nodes = @{
@@ -128,9 +128,9 @@ $frontendRouteBody = @{
         }
     }
     plugins = @{
-        "skywalking" = @{} # Aktifkan tracing SkyWalking
+        "skywalking" = @{}
         "redirect" = @{
-            http_to_https = $true # Redirect otomatis HTTP -> HTTPS
+            http_to_https = $true
         }
     }
 } | ConvertTo-Json -Depth 5

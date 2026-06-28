@@ -4,14 +4,13 @@ import { query } from '@/lib/db'
 import { signToken } from '@/lib/auth'
 import { User, ApiResponse, AuthUser } from '@/types'
 
-// Simple in-memory rate limiter for local testing on port 3001
 const loginAttempts = new Map<string, { count: number; resetTime: number }>()
 
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get('x-forwarded-for') || '127.0.0.1'
     const now = Date.now()
-    const WINDOW_MS = 60 * 1000 // 1 menit
+    const WINDOW_MS = 60 * 1000
 
     const record = loginAttempts.get(ip)
     if (record) {
