@@ -19,6 +19,7 @@ export interface JWTPayload {
   email: string
   role: Role
   name: string
+  key?: string
   iat?: number
   exp?: number
 }

@@ -17,4 +17,4 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/lib ./lib
 EXPOSE 3000
-CMD ["node", "-r", "skywalking-backend-js/bootstrap", "server.js"]
+CMD ["node", "server.js"]

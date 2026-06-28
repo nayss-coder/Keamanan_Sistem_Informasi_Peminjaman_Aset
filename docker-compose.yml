@@ -28,6 +28,7 @@ services:
     ports:
       - "9080:9080"
       - "9180:9180"
+      - "9443:9443"
     networks:
       - apisix-net
     depends_on:
@@ -120,14 +121,10 @@ services:
       JWT_SECRET: si-alat-super-secret-key-2024
       JWT_EXPIRES_IN: 15m
       NODE_ENV: production
-      SW_AGENT_NAME: "si-alat-backend"
-      SW_AGENT_COLLECTOR_BACKEND_SERVICES: "proyek-apisix-skywalking-oap:11800"
     ports:
       - "3000:3000"
     depends_on:
       mysql:
-        condition: service_healthy
-      skywalking-oap:
         condition: service_healthy
     networks:
       - apisix-net

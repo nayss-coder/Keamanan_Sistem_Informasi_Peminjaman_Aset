@@ -21,6 +21,10 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+      if (res.status === 429) {
+        setError("too many request try again in 2 minutes");
+        return;
+      }
       const data = await res.json();
       if (!data.success) {
         setError(data.error || "Login gagal");
